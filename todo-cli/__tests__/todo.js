@@ -33,6 +33,7 @@ describe("Todolist Test Suite", () => {
   });
 
   test("Test marking todo command as complete", () => {
+    expect(all[0].completed).toBe(false);
     markAsComplete(0);
     expect(all[0].completed).toBe(true);
   });
