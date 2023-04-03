@@ -77,8 +77,10 @@ const todoList = () => {
     let l = list
       .map(
         (x) =>
-          `${x.completed ? "[x]" : "[ ]"} ${x.title} ${
-            x.dueDate == new Date().toISOString().split("T")[0] ? "" : x.dueDate
+          `${x.completed ? "[x]" : "[ ]"} ${x.title.trim()} ${
+            x.dueDate == new Date().toISOString().split("T")[0]
+              ? ""
+              : x.dueDate.trim()
           }`
       )
       .join("\n");
