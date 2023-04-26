@@ -6,16 +6,16 @@ const { Todo } = require("./models");
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-app.get("/todos", (request, response) => {
-  response.send("Hello World");
-});
+// app.get("/todos", (request, response) => {
+//   response.send("Hello World");
+// });
 
 app.get("/todos", async function (_request, response) {
   console.log("Processing list of all Todos ...");
   // FILL IN YOUR CODE HERE
   try {
-    const todos = await Todo.findAll();
-    return response.send(todos);
+    const todos = await Todo.getTodos();
+    return response.json(todos);
   } catch (error) {
     console.log(error);
     return response.status(422).json(error);
@@ -54,7 +54,7 @@ app.put("/todos/:id/markAsCompleted", async (request, response) => {
   //console.log("We have to update a todo with ID:", request.params.id);
   const todo = await Todo.findByPk(request.params.id);
   try {
-    const updatedTodo = await Todo.markAsCompleted();
+    const updatedTodo = await todo.markAsCompleted();
     return response.json(updatedTodo);
   } catch (error) {
     console.log(error);
