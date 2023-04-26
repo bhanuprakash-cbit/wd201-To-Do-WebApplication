@@ -20,6 +20,9 @@ module.exports = (sequelize, DataTypes) => {
     static getTodos() {
       return this.findAll();
     }
+    static getTodos() {
+      return this.findAll();
+    }
   }
   Todo.init(
     {
