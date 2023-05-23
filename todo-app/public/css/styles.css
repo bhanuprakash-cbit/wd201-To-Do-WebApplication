@@ -1,8 +1,8 @@
 body {
-    font-family: sans-serif;
-    background-color: white;
+  font-family: sans-serif;
+  background-color: white;
 }
 
 .Todo-Item:hover .trash-icon {
-    display: inline-block;
+  display: inline-block;
 }
