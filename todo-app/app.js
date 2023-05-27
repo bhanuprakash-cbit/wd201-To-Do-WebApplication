@@ -1,5 +1,5 @@
-/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 const flash = require("connect-flash");
 const express = require("express");
 var csrf = require("tiny-csrf");
@@ -15,7 +15,6 @@ const session = require("express-session");
 const LocalStartegy = require("passport-local");
 const bcrypt = require("bcrypt");
 const { error } = require("console");
-const { request } = require("http");
 const saltRounds = 10;
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("shh!some secret string"));
@@ -27,7 +26,7 @@ app.use(flash());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
-    secret: "my-super-secret-key-2172816111615261653",
+    secret: "my-super-secret-key-21728172615261653",
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
     },
@@ -40,29 +39,30 @@ app.use(function (request, response, next) {
   response.locals.messages = request.flash();
   next();
 });
-
 passport.use(
   new LocalStartegy(
     {
       usernameField: "email",
       passwordField: "password",
     },
-    async (username, password, done) => {
-      try {
-        const user = await User.findOne({ where: { email: username } });
-        if (!user) {
-          return done(null, false, { message: "Email is not registered" });
-        }
+    (username, password, done) => {
+      User.findOne({ where: { email: username } })
+        .then(async function (user) {
+          if (!user) {
+            // Check if user is null
+            return done(null, false, { message: "Invalid email or password" });
+          }
 
-        const result = await bcrypt.compare(password, user.password);
-        if (result) {
-          return done(null, user);
-        } else {
-          return done(null, false, { message: "Invalid password" });
-        }
-      } catch (error) {
-        return done(error); // Pass the error to the 'done' callback
-      }
+          const result = await bcrypt.compare(password, user.password);
+          if (result) {
+            return done(null, user);
+          } else {
+            return done(null, false, { message: "Invalid password" });
+          }
+        })
+        .catch((err) => {
+          return done(err);
+        });
     }
   )
 );
@@ -111,16 +111,14 @@ app.post("/users", async (request, response) => {
     request.flash("error", "First name and email are required");
     return response.redirect("/signup");
   }
-
   if (
-    request.body.firstName.length !== 0 &&
-    request.body.email.length !== 0 &&
-    request.body.password.length === 0
+    request.body.firstName.length != 0 &&
+    request.body.email.length != 0 &&
+    request.body.password.length == 0
   ) {
-    request.flash("error", "Password is required");
+    request.flash("error", "Password must  be non-Empty");
     return response.redirect("/signup");
   }
-
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
   console.log(hashedPwd);
   try {
@@ -137,7 +135,7 @@ app.post("/users", async (request, response) => {
       response.redirect("/todos");
     });
   } catch (error) {
-    request.flash("error", "Email is already registered");
+    request.flash("error", "Email already registered");
     response.redirect("/signup");
     console.log(error);
   }
@@ -156,6 +154,10 @@ app.post(
     failureRedirect: "/login",
     failureFlash: true,
   }),
+  function (request, response, next) {
+    request.flash("error", request.authInfo.message);
+    next();
+  },
   function (request, response) {
     console.log(request.user);
     response.redirect("/todos");
