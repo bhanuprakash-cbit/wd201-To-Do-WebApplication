@@ -106,7 +106,7 @@ describe("Todo Application", function () {
 
   test("Test the marking an item as incomplete", async () => {
     const agent = request.agent(server);
-    await login(agent, "bhanu@test.com", "123");
+    await login(agent, "bhanu@test.com", "12345678");
     let res = await agent.get("/todos");
     let csrfToken = extractCsrfToken(res);
     await agent.post("/todos").send({
@@ -122,7 +122,7 @@ describe("Todo Application", function () {
     const parsedGroupedResponse = JSON.parse(groupedTodosResponse.text);
     const dueTodayCount = parsedGroupedResponse.dueToday.length;
     const latestTodo = parsedGroupedResponse.dueToday[dueTodayCount - 1];
-    const boolStatus = !Todo.completed;
+    const boolStatus = !groupedTodosResponse.completed;
     let anotherRes = await agent.get("/todos");
     csrfToken = extractCsrfToken(anotherRes);
 
